@@ -43,6 +43,8 @@ class Telemetry:
         It also collects system information which cannot change across the lifecycle
         of the process (for example `is_containerized()`).
         """
+        posthog.api_key = "***REMOVED***"
+        posthog.host = "https://eu.posthog.com"
 
         # disable posthog logging
         for module_name in ["posthog", "backoff"]:
