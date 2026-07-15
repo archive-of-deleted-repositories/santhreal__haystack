@@ -228,6 +228,21 @@ def test_split_only_headers():
     assert split_docs[0].content == text
 
 
+def test_preamble_before_first_header_is_kept():
+    """Content before the first header must not be dropped from the output."""
+    splitter = MarkdownHeaderSplitter(keep_headers=False)
+    text = "Intro paragraph before any header.\n\n# Header 1\nSection content."
+    result = splitter.run(documents=[Document(content=text)])
+    split_docs = result["documents"]
+
+    contents = [d.content for d in split_docs]
+    joined = "".join(contents)
+    assert "Intro paragraph before any header." in joined
+    # The preamble is emitted as the first chunk, ahead of the header section.
+    assert contents[0].strip() == "Intro paragraph before any header."
+    assert any("Section content." in c for c in contents)
+
+
 # Metadata preservation
 def test_preserve_document_metadata():
     """Test that document metadata is preserved through splitting."""

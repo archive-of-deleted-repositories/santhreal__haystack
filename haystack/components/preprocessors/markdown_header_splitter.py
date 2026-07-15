@@ -203,6 +203,26 @@ class MarkdownHeaderSplitter:
             )
             return [{"content": text, "meta": {}}]
 
+        # Prepend any preamble: prose that appears before the very first header
+        # of *any* level. The loop only captures text starting at each header,
+        # so leading intro text would otherwise be dropped. We anchor on the
+        # first header of any level (not the first configured-level header) so
+        # that content sitting under a higher-level header excluded by
+        # `header_split_levels` stays dropped, as that is the documented
+        # behavior for level-filtered splitting.
+        first_header = next(
+            (
+                m
+                for m in re.finditer(self._header_pattern, text)
+                if not any(start <= m.start() < end for start, end in code_spans)
+            ),
+            None,
+        )
+        if first_header is not None:
+            preamble = text[: first_header.start()]
+            if preamble.strip():
+                chunks.insert(0, {"content": preamble, "meta": {}})
+
         return chunks
 
     def _apply_secondary_splitting(self, documents: list[Document]) -> list[Document]:

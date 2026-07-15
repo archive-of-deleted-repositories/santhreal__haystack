@@ -1,0 +1,8 @@
+---
+fixes:
+  - |
+    Fixed `MarkdownHeaderSplitter` dropping content that appears before the
+    first header. Prose preceding the first header of any level is now emitted
+    as its own chunk instead of being silently discarded. Content sitting under
+    a higher-level header excluded by `header_split_levels` is still dropped, as
+    before.
