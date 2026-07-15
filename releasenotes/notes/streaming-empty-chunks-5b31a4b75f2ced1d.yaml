@@ -1,0 +1,7 @@
+---
+fixes:
+  - |
+    Fixed an `IndexError` in the OpenAI and OpenAI Responses chat generators
+    when the model stream yields no chunks (for example, a provider that blocks
+    the response and closes the stream immediately). An empty assistant
+    `ChatMessage` is now returned instead of crashing.

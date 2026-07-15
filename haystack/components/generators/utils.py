@@ -84,6 +84,16 @@ def _convert_streaming_chunks_to_chat_message(chunks: list[StreamingChunk]) -> C
 
     :returns: The ChatMessage.
     """
+    # An empty stream (e.g. a provider that blocks the response and closes the
+    # stream without emitting any chunk) yields an empty list. The meta access
+    # via chunks[-1]/chunks[0] below would then raise IndexError, so return an
+    # empty assistant message with the same meta shape instead.
+    if not chunks:
+        return ChatMessage.from_assistant(
+            text=None,
+            meta={"model": None, "index": 0, "finish_reason": None, "completion_start_time": None, "usage": None},
+        )
+
     text = "".join([chunk.content for chunk in chunks])
     logprobs = []
     for chunk in chunks:

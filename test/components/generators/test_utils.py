@@ -23,6 +23,19 @@ from haystack.dataclasses import (
 )
 
 
+def test_convert_streaming_chunks_to_chat_message_empty_chunks():
+    """An empty stream must not raise IndexError on chunks[-1]/chunks[0] meta access."""
+    result = _convert_streaming_chunks_to_chat_message(chunks=[])
+
+    assert isinstance(result, ChatMessage)
+    assert result.is_from("assistant")
+    assert result.text is None
+    assert result.tool_calls == []
+    assert result.meta["finish_reason"] is None
+    assert result.meta["usage"] is None
+    assert result.meta["model"] is None
+
+
 def test_convert_streaming_chunks_to_chat_message_tool_calls_in_any_chunk():
     chunks = [
         StreamingChunk(
